@@ -4,7 +4,7 @@
 unsigned char *dbuf;	//the double buffer for showing screen effects
 
 //copies the screen 
-#define CPS() memcpy(SCREEN_BASE_ADDRESS,dbuf,320*240/2)
+//#define CPS() memcpy(SCREEN_BASE_ADDRESS,dbuf,320*240/2)
 
 typedef struct{		//holds a 2D vector (16x16 fixed point)
 	int x,y;
@@ -419,7 +419,7 @@ void show_credit_screen(){
 	system.cx = 320/2;
 	system.cy = 240/2;
 	dbuf = malloc(320*240/2);
-	memcpy(dbuf,SCREEN_BASE_ADDRESS,320*240/2);
+	//memcpy(dbuf,SCREEN_BASE_ADDRESS,320*240/2);
 	draw_buf = dbuf;
 	
 	center_text(&system,&y,"nFrotz - ported by:",0,0x7FFFF);
@@ -490,7 +490,7 @@ void show_end_screen(){
 	if(text_color == BLACK){
 		invert_screen();
 	}
-	memcpy(dbuf,SCREEN_BASE_ADDRESS,320*240/2);
+	//memcpy(dbuf,SCREEN_BASE_ADDRESS,320*240/2);
 	
 	capture_particles(&system,15,0,0,319,239);
 	handle_particle_system(&system);
@@ -529,7 +529,7 @@ void show_initial_reverse(){
 	nio_printf(&status_line,"\n  %s",current_file_name);
 	
 	//only display the first 9 rows
-	memcpy(SCREEN_BASE_ADDRESS,dbuf,9*320/2);
+	//memcpy(SCREEN_BASE_ADDRESS,dbuf,9*320/2);
 	
 	ParticleSystem system;
 	create_particle_system(&system,20000,NO_DRAW|NO_GRAVITY|UPDATE_SMALL);
@@ -559,10 +559,10 @@ void show_initial_reverse(){
 	
 	handle_particle_system(&system);
 	cleanup_particle_system(&system);
-	draw_buf = SCREEN_BASE_ADDRESS;
+	//draw_buf = SCREEN_BASE_ADDRESS;
 	nio_printf(&status_line,"\n");
 	memcpy(status_line.data,save_title,51);
-	nio_DrawConsole(&status_line);
+	//nio_DrawConsole(&status_line);
 	
 	wait_no_key_pressed();
 }

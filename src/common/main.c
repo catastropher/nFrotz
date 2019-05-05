@@ -27,6 +27,7 @@
  */
 
 #include "frotz.h"
+#define NU_SUCCESS 0
 
 nio_console console;
 nio_console status_line;
@@ -283,7 +284,7 @@ char *file_list;				//nFrotz - list of files for the file browser
 extern unsigned char *dbuf;		//nFrotz - double buffer for screen effects
 
 //nFrotz - copies the double buffer to the screen
-#define CPS() memcpy(SCREEN_BASE_ADDRESS,dbuf,320*240/2)
+//#define CPS() memcpy(SCREEN_BASE_ADDRESS,dbuf,320*240/2)
 
 //nFrotz - the name of the current file being run
 char current_file_name[128];
@@ -294,15 +295,15 @@ char current_file_name[128];
 bool show_file_browser(char **file_name){
 	file_list = malloc(4096);
 	
-	nio_printf(&status_line,"\n  Select file");
+	nio_fprintf(&status_line,"\n  Select file");
 	
 	int count = 0;
 	
 	find_all_files("",".z.tns",file_list,&count);
 	
 	if(count == 0){
-		nio_printf(&console,"<No game files found>");
-		CPS();
+		nio_fprintf(&console,"<No game files found>");
+		//CPS();
 		while(!isKeyPressed(KEY_NSPIRE_ESC)) idle();
 		return 0;
 	}
@@ -311,23 +312,23 @@ bool show_file_browser(char **file_name){
 	char tempname[128];
 	
 	for(i = 0;i < count;i++){
-		nio_printf(&console," %s\n",get_file_name(file_list+i*256,tempname));
+		nio_fprintf(&console," %s\n",get_file_name(file_list+i*256,tempname));
 	}
 	
 	int pos = 0;
 	
 	do{
-		console.cursor_x = 0;
-		console.cursor_y = pos;
-		nio_PrintChar(&console,'>');
+		//console.cursor_x = 0;
+		//console.cursor_y = pos;
+		nio_fputc('>', &console);
 		
-		CPS();
+		//CPS();
 		wait_no_key_pressed();
 		wait_key_pressed();
 		
-		console.cursor_x = 0;
-		console.cursor_y = pos;
-		nio_PrintChar(&console,' ');
+		//console.cursor_x = 0;
+		//console.cursor_y = pos;
+		nio_fputc(' ', &console);
 	
 		if(isKeyPressed(KEY_NSPIRE_UP)){
 			if(pos == 0){
@@ -361,12 +362,12 @@ bool show_file_browser(char **file_name){
 	strcpy(current_file_name,get_file_name(*file_name,tempname));
 	
 	for(i = 0;i < 35;i++){
-		nio_printf(&console,"\n");
-		CPS();
+		nio_fprintf(&console,"\n");
+		//CPS();
 	}
 	
 	nio_clear(&console);
-	CPS();
+	//CPS();
 	
 	return 1;
 	
@@ -388,7 +389,6 @@ int install_nfrotz(void) {
 	if(1){
         char buffer[BUF_SIZE] = {'\0'};
         FILE *fp;
-        int i;
         //assert_ndless_rev(538);
         fp = fopen(NDLESS_CFG, "a+");
         if (fp == NULL) {
@@ -426,15 +426,15 @@ void clear_status_line();
 void cleanup_input();
 
 void invert_screen(){
-	int y = 0;
-	int i;
-	unsigned char *screen = SCREEN_BASE_ADDRESS;
+	//int y = 0;
+	//int i;
+	//unsigned char *screen = SCREEN_BASE_ADDRESS;
 	
-	for(y = 0;y < 240;y++){
-		for(i = 0;i < 320/2;i++){
-			screen[(y * 320/2) + i] = ~screen[(y * 320/2) + i];
-		}
-	}
+	//for(y = 0;y < 240;y++){
+	//	for(i = 0;i < 320/2;i++){
+	//		screen[(y * 320/2) + i] = ~screen[(y * 320/2) + i];
+	//	}
+	//}
 }
 
 //nFrotz - copy of the file browser before nFrotz is launched (for the
@@ -444,8 +444,8 @@ void *save_screen;
 //nFrotz - wipes the screen in the scrolling effect seen at the beginning
 //color is whether or not the LCD is currently in color or gray
 void wipe_screen(bool color){
-	save_screen = malloc(color ? 320*240*2 : 320*240/2);
-	memcpy(save_screen,SCREEN_BASE_ADDRESS,color ? 320*240*2 : 320*240/2);
+	//save_screen = malloc(color ? 320*240*2 : 320*240/2);
+	//memcpy(save_screen,SCREEN_BASE_ADDRESS,color ? 320*240*2 : 320*240/2);
 	
 	int i,d;
 	unsigned short wipe_color;
@@ -453,7 +453,7 @@ void wipe_screen(bool color){
 	short byte_width = (color ? 320*2 : 320/2);
 	
 	for(i = 0;i < 240;i++){
-		memcpy(SCREEN_BASE_ADDRESS,SCREEN_BASE_ADDRESS+byte_width,240*byte_width-byte_width);
+		//memcpy(SCREEN_BASE_ADDRESS,SCREEN_BASE_ADDRESS+byte_width,240*byte_width-byte_width);
 		
 		if(i < 9){
 			wipe_color = 0xFFFF;
@@ -464,16 +464,16 @@ void wipe_screen(bool color){
 		
 		for(d = 0;d < 320;d++){
 			if(color){
-				*((short *)SCREEN_BASE_ADDRESS + 239*320 + d) = wipe_color;
+		//		*((short *)SCREEN_BASE_ADDRESS + 239*320 + d) = wipe_color;
 			}
 			else{
-				*((char *)SCREEN_BASE_ADDRESS + 239*byte_width + d) = wipe_color;
+		//		*((char *)SCREEN_BASE_ADDRESS + 239*byte_width + d) = wipe_color;
 			}
 		}
 	
-		volatile int delay = color ? 0xFFFF/5 : (0xFFFF/5)*4;
+		//volatile int delay = color ? 0xFFFF/5 : (0xFFFF/5)*4;
 			
-		for(;delay >= 0;delay--) ;
+		//for(;delay >= 0;delay--) ;
 	}
 }
 
@@ -484,74 +484,71 @@ void restore_screen(bool color){
 	
 	short byte_width = (color ? 320*2 : 320/2);
 	
-	char *new_screen = malloc(byte_width*240*2);
+	//char *new_screen = malloc(byte_width*240*2);
 	
-	memcpy(new_screen+240*byte_width,SCREEN_BASE_ADDRESS,byte_width*240);
-	memcpy(new_screen,save_screen,byte_width*240);
+	//memcpy(new_screen+240*byte_width,SCREEN_BASE_ADDRESS,byte_width*240);
+	//memcpy(new_screen,save_screen,byte_width*240);
 	
 	for(i = 0;i < 239;i++){
-		memcpy(SCREEN_BASE_ADDRESS,new_screen+(239-i)*byte_width,byte_width*240);
+	//	memcpy(SCREEN_BASE_ADDRESS,new_screen+(239-i)*byte_width,byte_width*240);
 		
 		volatile int delay = color ? 0xFFFF/5 : (0xFFFF/5)*4;
 			
-		for(;delay >= 0;delay--) ;
+	//	for(;delay >= 0;delay--) ;
 	}
 	
-	free(save_screen);
-	free(new_screen);
+	//free(save_screen);
+	//free(new_screen);
 }
 
 
 //fast color macros
-#define getR(c) ((((((c) & 0xF800) >> 11) - 1) * 8) + 1)
-#define getG(c) ((((((c) & 0x7E0) >> 5) - 1) * 4) + 1)
-#define getB(c) (((((c) & 0x1F) - 1) * 8) + 1)
-#define getBW(c) ((((getR(c)) / 16) + ((getG(c)) / 16) + ((getB(c)) / 16)) / 3)
+//#define getR(c) ((((((c) & 0xF800) >> 11) - 1) * 8) + 1)
+//#define getG(c) ((((((c) & 0x7E0) >> 5) - 1) * 4) + 1)
+//#define getB(c) (((((c) & 0x1F) - 1) * 8) + 1)
+//#define getBW(c) ((((getR(c)) / 16) + ((getG(c)) / 16) + ((getB(c)) / 16)) / 3)
 
 //nFrotz - converts the color contents of the screen to grayscale
 void conv_screen_to_bw(){
-	unsigned char *bw_scr = malloc(320*240/2);
-	unsigned short *scr = SCREEN_BASE_ADDRESS;
-	int i;
+	//unsigned char *bw_scr = malloc(320*240/2);
+	//unsigned short *scr = SCREEN_BASE_ADDRESS;
+	// int i;
 	
-	for(i = 0;i < 320*240;i+=2){
-		unsigned char bw_color1 = getBW((scr[i]));
-		unsigned char bw_color2 = getBW((scr[i+1]));
-		bw_scr[i/2] = (bw_color1 << 4) | bw_color2;
-	}
+	//for(i = 0;i < 320*240;i+=2){
+	//	unsigned char bw_color1 = getBW((scr[i]));
+	//	unsigned char bw_color2 = getBW((scr[i+1]));
+	//	bw_scr[i/2] = (bw_color1 << 4) | bw_color2;
+	//}
 	
 	volatile unsigned int *lcd_control = IO_LCD_CONTROL;
 	
-	while(((*lcd_control >> 12) & 3) != 0) ;	//wait for vertical sync
+	//while(((*lcd_control >> 12) & 3) != 0) ;	//wait for vertical sync
 	
-	lcd_ingray();
-	memcpy(SCREEN_BASE_ADDRESS,bw_scr,320*240/2);
-	free(bw_scr);
+	//lcd_ingray();
+	//memcpy(SCREEN_BASE_ADDRESS,bw_scr,320*240/2);
+	//free(bw_scr);
 }
 
 //nFrotz - converts the grayscale contents of the screen to color
 void conv_screen_to_color(){
-	int i,d;
-	unsigned char *scr = SCREEN_BASE_ADDRESS;
+	// int i,d;
+	// unsigned char *scr = SCREEN_BASE_ADDRESS;
 	
-	for(i = 0;i < 240;i++){
-		for(d = 0;d < 320/2;d++){
-			scr[i*320/2 + d] = 0;
-		}
+	// for(i = 0;i < 240;i++){
+	// 	for(d = 0;d < 320/2;d++){
+	// 		scr[i*320/2 + d] = 0;
+	// 	}
 		
-		volatile int delay = 0xFFFF;
+	// 	volatile int delay = 0xFFFF;
 		
-		while(delay-- > 0) ;
-	}
+	// 	while(delay-- > 0) ;
+	// }
 	
-	volatile unsigned int *lcd_control = IO_LCD_CONTROL;
-	*lcd_control&=~(1 << 11);
-	lcd_incolor();
-	*lcd_control|=(1 << 11);
+	// volatile unsigned int *lcd_control = IO_LCD_CONTROL;
+	// *lcd_control&=~(1 << 11);
+	// lcd_incolor();
+	// *lcd_control|=(1 << 11);
 }
-
-void show_end_screen();		//nFrotz - performs the black hole effect
-void show_credit_screen();	//nFrotz - shows the credits
 				
 int cdecl main(int argc, char *argv[])
 {
@@ -594,17 +591,13 @@ int cdecl main(int argc, char *argv[])
 	background_color = BLACK;	
 	
 	//create the consoles
-    nio_InitConsole (&console, 54, 28, 1, 10, background_color, text_color);
-	lcd_ingray();
-	nio_Clear(&console);
-	nio_InitConsole(&status_line,54,1,0,0,text_color,background_color);
-	nio_Clear(&status_line);
+    nio_init(&console, 54, 28, 1, 10, background_color, text_color, true);
+	nio_clear(&console);
+	nio_init(&status_line, 54, 1, 0, 0, text_color, background_color, true);
+	nio_clear(&status_line);
 	
 	char *file_name;
-	
-	//show the credits!
-	show_credit_screen();
-	
+		
 	if(!ext_start){		//if no specified file, show the file browser
 		if(!show_file_browser(&file_name)){
 			goto done;	//spaghetti code!
@@ -634,7 +627,7 @@ int cdecl main(int argc, char *argv[])
     init_sound ();
 	
     os_init_screen ();
-	clear_status_line();
+	//clear_status_line();
 
     init_undo ();
 
@@ -642,8 +635,6 @@ int cdecl main(int argc, char *argv[])
 	
     interpret ();
 	
-	//do the black hole effect
-	show_end_screen();
 	
 done:
 	if(color){	//convert the screen back to color
@@ -663,7 +654,7 @@ done:
     os_reset_screen ();
 
     CLEANUP ();
-	cleanup_input();
+	//cleanup_input();
 	
 	//free the list of files generated by the file browser
 	if(file_list != NULL){

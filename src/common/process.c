@@ -184,10 +184,6 @@ void (*ext_opcodes[0x1d]) (void) = {
 
 void init_process (void)
 {
-    nl_relocdata((unsigned *)op0_opcodes, 0x10);
-    nl_relocdata((unsigned *)op1_opcodes, 0x10);
-    nl_relocdata((unsigned *)var_opcodes, 0x40);
-    nl_relocdata((unsigned *)ext_opcodes, 0x1d);
     finished = 0;
 } /* init_process */
 

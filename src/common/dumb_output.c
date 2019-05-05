@@ -142,7 +142,6 @@ void os_set_text_style(int x)
 }
 
 extern nio_console status_line;
-void show_row(int r);
 
 /* put a character in the cell at the cursor and advance the cursor.  */
 static void dumb_display_char(char c)
@@ -266,7 +265,7 @@ int os_font_data(int font, int *height, int *width)
 void os_set_colour (int x, int y) {}
 void os_set_font (int x) {}
 	
-#define DISP(format,args...) nio_printf((cwin == 0 ? &console : &status_line),format,args)
+#define DISP(format,args...) nio_fprintf((cwin == 0 ? &console : &status_line),format,args)
 
 /* Print a cell to stdout.  */
 static void show_cell(cell cel)
@@ -555,8 +554,6 @@ bool dumb_output_handle_setting(const char *setting, bool show_cursor,
 
 void dumb_init_output(void)
 {
-    nl_relocdata((unsigned *)compression_names, 3);
-    nl_relocdata((unsigned *)rv_names, 4);
 
     if (h_version == V3) {
         h_config |= CONFIG_SPLITSCREEN;

@@ -1,3 +1,5 @@
+DEBUG = FALSE
+
 SOURCES = \
 	src/common/buffer.c \
 	src/common/err.c \
@@ -22,24 +24,44 @@ SOURCES = \
 	src/dumb/dumb_input.c \
 	src/dumb/dumb_output.c \
 	src/dumb/dumb_pic.c
-TARGET = nFrotz.tns
+EXE = nFrotz
+
 OBJECTS = $(SOURCES:.c=.o)
 
 CC = nspire-gcc
 LD = nspire-ld
-OBJCOPY = arm-none-eabi-objcopy
-CFLAGS = -Wall -Wextra -Os -DVERSION="\"2.43d\""
-LDFLAGS =
-LIBS = -lnspireio2
+GENZEHN = genzehn
 
-all: $(TARGET)
+CFLAGS = -Wall -Wextra -marm -I../../include -Os -DVERSION="\"2.43d\""
+LDFLAGS = ../../lib/libnspireio.a
+LIBS = -lnspireio
+ZEHNFLAGS = --name "nFrotz"
 
-$(TARGET): $(OBJECTS)
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $(@:.tns=.elf)
-	$(OBJCOPY) -O binary $(@:.tns=.elf) $(TARGET)
+ifeq ($(DEBUG),FALSE)
+        CFLAGS += -Os
+else
+        CFLAGS += -O0 -g
+endif
+
+
+DISTDIR = ./bin
+vpath %.tns $(DISTDIR)
+vpath %.elf $(DISTDIR)
+
+
+all: $(EXE).prg.tns
+
+$(EXE).elf: $(OBJECTS)
+		$(LD) $(LDFLAGS) $^ $(LIBS) -o $(@:.tns=.elf)
+
+$(EXE).tns: $(EXE).elf
+		$(GENZEHN) --input $^ --output $@ $(ZEHNFLAGS)
+
+$(EXE).prg.tns: $(EXE).tns
+		make-prg $^ $@
 
 .c.o:
-	$(CC) $(CFLAGS) -c $< -o $@
+		$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJECTS) $(TARGET:.tns=.elf) $(TARGET)
+		rm -f $(OBJECTS) $(DISTDIR)/$(EXE).tns $(DISTDIR)/$(EXE).elf $(DISTDIR)/$(EXE).prg.tns

@@ -12,32 +12,27 @@
 /* #include "../config.h" */
 
 #include <os.h>
-#include <nspireio2.h>
+#include <nspireio/nspireio.h>
 
 #define NFROTZ_VERSION "0.1"
 #define RTC() *(volatile unsigned *)0x90090000
 
 #define CLEANUP() do { \
-    nio_CleanUp(&console); \
-	 nio_CleanUp(&status_line);\
-    if (has_colors) \
-        lcd_incolor(); \
+    nio_free(&console); \
+	nio_free(&status_line);\
 } while (0)
 
 #define PRINT(fmt, args...) do { \
-    nio_printf(&console, fmt, ## args); \
+    nio_fprintf(&console, fmt, ## args); \
 } while (0)
 
 #define PRINT_ALT(fmt, args...) do { \
-    fprintf(stderr, fmt, ## args); \
-    nio_printf(&console, fmt, ## args); \
+    nio_fprintf(&console, fmt, ## args); \
 } while (0)
 
-#define nio_clear(args...) nio_Clear(args)
-
+extern nio_console status_line;
 extern nio_console console;
 
-typedef int bool;
 typedef unsigned char zbyte;
 typedef unsigned short zword;
 
@@ -456,6 +451,8 @@ extern char *option_zcode_path;	/* dg */
 
 extern long reserve_mem;
 
+short status_cell_pos;
+void show_row(int r);
 
 /*** Blorb stuff ***/
 /*
@@ -675,12 +672,12 @@ int  	os_font_data (int, int *, int *);
 void 	os_init_screen (void);
 void 	os_more_prompt (void);
 int  	os_peek_colour (void);
-int  	os_picture_data (int, int *, int *);
+bool  	os_picture_data (int, int *, int *);
 void 	os_prepare_sample (int);
 void 	os_process_arguments (int, char *[]);
 int	os_random_seed (void);
 int  	os_read_file_name (char *, const char *, int);
-zchar	os_read_key (int, int);
+zchar	os_read_key (int, bool);
 zchar	os_read_line (int, zchar *, int, int, int);
 void 	os_reset_screen (void);
 void 	os_restart_game (int);

@@ -395,7 +395,6 @@ void init_memory (void)
 		
 	int p_start = 0;
 		
-	nl_relocdata(&p_start,1);
 
     if (h_version <= V4) {
         op0_opcodes[0x09] = z_pop-p_start;

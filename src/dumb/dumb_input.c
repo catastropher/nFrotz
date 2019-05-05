@@ -68,7 +68,7 @@ enum input_type {
 static void getline(char *s)
 {
     size_t length;
-    nio_GetStr(&console, s);
+    nio_fgets(s, 1000, &console);
     length = strlen(s);
     s[length] = '\n';
     s[length + 1] = '\0';

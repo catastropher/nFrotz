@@ -77,7 +77,6 @@ void init_err (void)
 {
     int i;
 
-    nl_relocdata((unsigned *)err_messages, 32);
 
     /* Initialize the counters. */
 

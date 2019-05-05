@@ -199,7 +199,7 @@ int restart_count = 0;
 
 void os_restart_game (int stage) {
 	if(!first_restart){
-		cleanup_input();
+		//cleanup_input();
 		first_read = 1;
 		//clear_title_screen();
 	}
@@ -208,7 +208,7 @@ void os_restart_game (int stage) {
 		scroll_on_input = 1;
 		int i;
 		for(i = 0;i < 30;i++){
-			nio_printf(&console,"\n");
+			nio_fprintf(&console,"\n");
 		}
 	}
 	
@@ -221,7 +221,7 @@ void os_fatal (const char *s)
 {
     PRINT_ALT("\nFatal error: %s\n", s);
     CLEANUP();
-	cleanup_input();
+	// cleanup_input();
     exit(1);
 }
 

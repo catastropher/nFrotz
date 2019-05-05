@@ -23,6 +23,7 @@
 extern void set_header_extension (int, zword);
 
 extern int direct_call (zword);
+extern void show_row(int r);
 
 static struct {
     enum story story_id;

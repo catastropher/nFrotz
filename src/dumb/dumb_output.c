@@ -278,7 +278,7 @@ static void show_line_prefix(int row, char c)
 }
 
 /* Print a row to stdout.  */
-static void show_row(int r)
+void show_row(int r)
 {
     if (r == -1) {
         show_line_prefix(-1, '.');
@@ -508,8 +508,6 @@ bool dumb_output_handle_setting(const char *setting, bool show_cursor,
 
 void dumb_init_output(void)
 {
-    nl_relocdata((unsigned *)compression_names, 3);
-    nl_relocdata((unsigned *)rv_names, 4);
 
     if (h_version == V3) {
         h_config |= CONFIG_SPLITSCREEN;
